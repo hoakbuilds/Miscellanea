@@ -2,16 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
 #include <fcntl.h>
 
-void append(char *buffer, char c){
+void append(char *buffer, char r){
     
     int l = strlen(buffer);
-    buffer[l]=c;
+    buffer[l]=r;
     buffer[l+1]='\0';
-    c='\0';
+    r='\0';
 }
 
 int main(int argc, char* argv[]){
@@ -23,10 +21,11 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
-    off_t maxpos = lseek(fd, -1, SEEK_END);
+    off_t maxpos = lseek(fd, 0, SEEK_END);
     off_t minpos = lseek(fd, 0, SEEK_SET);
     off_t currpos = minpos;
-    int i = 0, n = 0;
+    off_t n = -1;
+    int i = 0;
     const char mais = '+';
     const char barran = '\n';
     const char menos = '-';
@@ -34,12 +33,16 @@ int main(int argc, char* argv[]){
     const char fim = 'f';
     const char ler = 'r';
     const char limpar = 'l';
-    const char stop = 's';
-    char r;
-    char c;
-    char buffer[100];       
+    char r= '0', c = '0';
+    char buffer[100];
 
-    while( 0<scanf("%c %d\n", &c, &n) ){
+    for(i=0;i<100;i++){ 
+        buffer[i]='\0';
+    }       
+
+    while( c != 's' ){
+
+        scanf("%c %ld\n", &c, &n);
 
         if( 0==strncmp(&c, &inicio, 1)  ){
 
@@ -63,11 +66,17 @@ int main(int argc, char* argv[]){
 
         }else if( 0==strncmp(&c, &fim, 1)){
 
-            currpos = lseek(fd, (-abs(n+1)), SEEK_END);
+            currpos = lseek(fd, (-abs(n)), SEEK_END);
             
         }else if( 0==strncmp(&c, &ler, 1)){
-            if(n>99) continue;
+            
+            if( currpos == maxpos ) continue;
+            if( ( currpos + n ) > maxpos ){
+                n = ( maxpos - currpos );
+            }
+
             for(i=0; i<n; i++){
+                if(currpos == maxpos ) break;
                 read(fd, &r, 1);
                 append(buffer, r);
             }
@@ -75,20 +84,18 @@ int main(int argc, char* argv[]){
         }else if( 0==strncmp(&c, &limpar, 1)){
 
             if( 0 == n ){
-
                 for(i=0;i<100;i++){ 
                     buffer[i]='\0';
                 }
             }
-        }else if( 0==strncmp(&c, &stop, 1) ){
-                
-            if( 0 == n ){
-                write(STDOUT_FILENO, buffer, strlen(buffer));
-                write(STDOUT_FILENO, &barran, 1);
-                break;
-            }
-        } else continue;
 
+        }else continue;
+
+    }
+
+    if( c == 's' && n == 0){
+        write(STDOUT_FILENO, &buffer, strlen(buffer));
+        write(STDOUT_FILENO, &barran, 1);
     }
 
     return 0;
