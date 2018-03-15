@@ -38,7 +38,6 @@ void processfile(FILE* f, int op, int base){
 			if(16 == base){ 
 				a = strtol(tok, &tok, base);
 			} else a = atoi(tok);
-			
 			if(0 == op){
 				calculo += a;
 			} else {
