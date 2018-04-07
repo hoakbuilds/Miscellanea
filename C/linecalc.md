@@ -127,9 +127,9 @@ File Not Found lixo
 
 linecalc -base=
 
-ab
+ab a
 b
-
+ab 5
 b
 
 ## Useful C Functions
@@ -137,7 +137,8 @@ b
 getline() and fgets()
 strtok() string to token
 sscanf read from string
-%d, %i and %x format qualifiers
+For decimal, octal and hexadecimal formats
+%d, %o and %x format qualifiers
 strlen()
 
 ALL COMPILATION must be with the ALL WARNINGS flag
@@ -145,4 +146,9 @@ cc -Wall
 Before submitting a solution there must be no warnings from the compiler.
 see https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 
+hints
+Read lines of text to a string
+Parse a line string into little strings using tokenizer strtok() .. click aqui [http://www.br-c.org/doku.php?id=strtok](http://www.br-c.org/doku.php?id=strtok)
+read the little string using sscanf() .. which is scanf from a string
+A fun ̧c ̃ao sscanf ́e idˆentica `a fun ̧c ̃ao scanf, mas os dados s ̃ao lidos da string.
 
