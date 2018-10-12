@@ -3,6 +3,19 @@ from pprint import pprint
 import copy
 import random
 
+
+# ------------------------------------------------------------------
+def mostra_quatrolinha(T):
+	tabuleiro = ''
+	for x in range(9):
+		
+		if x == 4 or x == 8:
+			tabuleiro += '  \n ' + str(T[x])
+		else:
+			tabuleiro += ' ' + str(T[x])
+		
+	print(tabuleiro)
+
 # ------------------------------------------------------------------
 def mostra_tabuleiro(T):
 	tabuleiro = ''
@@ -41,41 +54,54 @@ def resultado(T,a,jog):
 # existem 8 possíveis alinhamentos vencedores, para cada jogador
 def utilidade(T):
 	# testa as linhas
+	ret = 0
 	for i in (0,3,6):
 		if ( T[i] == T[i+1] and T[i] == T[i+2] ):
 			if T[i] == 0:
-				return 0 
+				if ret != 0:
+					continue
+				else:
+					ret = 0
 			elif T[i] == 1:
-				return 1 
+				ret = 1
 			else:
-				return -1
+				ret = -1
 	# testa as colunas
 	for i in (0,1,2):
 		if ( T[i] == T[i+3] and T[i] == T[i+6] ):
 			if T[i] == 0:
-				return 0 
+				if ret != 0:
+					continue
+				else:
+					ret = 0
 			elif T[i] == 1:
-				return 1 
+				ret
 			else:
-				return -1
+				ret = -1
 	# testa as diagonais
 	if ( T[0] == T[4] and T[0] == T[8] ):
 		if T[0] == 0:
-			return 0 
+			if ret != 0:
+				pass
+			else:
+				ret = 0
 		elif T[0] == 1:
-			return 1 
+			ret = 1 
 		else:
-			return -1
+			ret = -1
 	
 	if ( T[2] == T[4] and T[4] == T[6] ):
 		if T[2] == 0:
-			return 0 
+			if ret != 0:
+				pass
+			else:
+				ret = 0
 		elif T[2] == 1:
-			return 1 
+			ret = 1 
 		else:
-			return -1
+			ret = -1
 	# não é nodo folha ou dá empate
-	return 0
+	return ret
 
 # ------------------------------------------------------------------
 # devolve True se T é terminal, senão devolve False
@@ -125,13 +151,13 @@ def alfabeta(T,alfa,beta,jog):
 # ------------------------------------------------------------------
 def joga_max(T):
 	v,a,e = alfabeta(T,-10,10,True)
-	print('  MAX joga para ' + str(a) + '\n') 
+	print('MAX joga para ' + str(a) + '\n') 
 	return e
 
 # ------------------------------------------------------------------
 def joga_min(T):
 	v,a,e = alfabeta(T,-10,10,False)
-	print('  MIN joga para ' + str(a) + '\n')
+	print('MIN joga para ' + str(a) + '\n')
 	return e
 	# IMPLEMENTAR
 
@@ -156,11 +182,11 @@ def jogo(p1,p2):
 			mostra_tabuleiro(T)
 	# fim
 	if utilidade(T) == 1:
-		print("Venceu o MAX")
+		print("Venceu o MAX\n\n")
 	elif utilidade(T) == -1:
-		print("Venceu o MIN")
+		print("Venceu o MIN\n\n")
 	else:
-		print("Empate")
+		print("Empate\n\n")
 
 def jogador(T, player_name, player):
 
@@ -174,6 +200,7 @@ def jogador(T, player_name, player):
 			aux = copy.copy(T)
 			if aux[int(x)] == 0:
 				aux[int(x)] = 1
+				joga = 1
 				print("Jogador '" + str(player_name) + "' jogou na casa " + str(x))
 				return aux
 			else:
@@ -183,6 +210,7 @@ def jogador(T, player_name, player):
 			aux = copy.copy(T)
 			if aux[int(x)] == 0:
 				aux[int(x)] = -1
+				joga = 1
 				print("Jogador '" + str(player_name) + "' jogou na casa " + str(x))
 				return aux
 			else:
@@ -200,23 +228,60 @@ def jogo_pvp(player1,player2):
 	mostra_tabuleiro(T)
 	while utilidade(T) == 0:
 		jogada +=1
-		print("Jogada " + str(jogada))
+		print("Jogada " + str(jogada) + ": " + str(player1) + " a jogar.")
 		T=jogador(T, player1, 1)
 		mostra_tabuleiro(T)
 		if utilidade(T) == 0:
 			jogada +=1
-			print("Jogada " + str(jogada))
+			print("Jogada " + str(jogada) + ": " + str(player2) + " a jogar.")
 			T=jogador(T, player2, 2)
 			mostra_tabuleiro(T)
 		else:
 			break
 	# fim
 	if utilidade(T) == 1:
-		print("Venceu o " + str(player1))
+		print("Venceu o " + str(player1) + "\n\n")
 	elif utilidade(T) == -1:
-		print("Venceu o " + str(player2))
+		print("Venceu o " + str(player2) + "\n\n")
 	else:
 		print("Empate")
+
+def jogo_pvai(player):
+	# cria tabuleiro vazio
+	T = [0,0,0,0,0,0,0,0,0]
+	jogada = 0
+	# podemos partir de um estado mais "avançado"
+	#T = [1,-1,0,0,-1,0,1,0,0]
+	print("\n\nInicio do jogo\n")
+	mostra_tabuleiro(T)
+	while utilidade(T) == 0:
+		jogada +=1
+		print("Jogada " + str(jogada))
+		T=jogador(T, player, 2)
+		mostra_tabuleiro(T)
+		if ( T[6] == T[7] and T[7] == T[8] ):
+			print(utilidade(T))
+			if T[6] == 0:
+				print("0") 
+			elif T[7] == 1:
+				print("1") 
+			else:
+				print("-1") 
+		if utilidade(T) == 0 and acoes(T) != [] and not estado_terminal(T):
+			jogada +=1
+			print("Jogada " + str(jogada))
+			T=joga_max(T)
+			mostra_tabuleiro(T)
+		else:
+			break
+	# fim
+	if utilidade(T) == -1:
+		print("Venceu o " + str(player) + "\n\n")
+	elif utilidade(T) == 1:
+		print("Venceu o MAX."  + "\n\n")
+	else:
+		print("Empate")
+
 
 # ------------------------------------------------------------------
 # jogador aleatório
@@ -246,15 +311,17 @@ def player_vs_player():
 	return
 
 def player_vs_ai():
-	print("pvai")
+	print("Nome do Jogador:")
+	player1 = input(">> ")
+	jogo_pvai(player1)
 	return
 
 def ai_vs_ai():
-	print("aivai")
+	jogo(joga_max, joga_min)
 	return
 
 def ai_vs_rand():
-	print("aivrand")
+	jogo(joga_max, joga_rand)
 	return
 
 def main():
